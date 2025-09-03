@@ -4,7 +4,6 @@ import joblib
 import pandas as pd
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
-from pydantic.v1 import PositiveInt, PositiveFloat
 
 app = FastAPI()
 
@@ -13,26 +12,30 @@ model = joblib.load("models/real_estate_pipeline.joblib")
 class PropertyTypeEnum(str, Enum):
     STUDIO = "Студия"
     ONE_ROOM = "1-комнатная"
-    TWO_ROOMS = "южный"
-    THREE_ROOMS = "восточный"
-    FOUR_ROOMS = "западный"
-    FIVE_ROOMS = ''
+    TWO_ROOMS = "2-комнатная"
+    THREE_ROOMS = "3-комнатная"
+    FOUR_ROOMS = "4-комнатная"
+    FIVE_ROOMS = "5-комнатная"
+
+class MetroGetTypeEnum(str, Enum):
+    LEGS = 'legs'
+    CAR = 'car'
 
 class PropertyFeatures(BaseModel):
-    flat_status: bool = Field(description='Сдаётся ли в данный момент квартира?')
-    num_of_rooms: str
-    total_area: PositiveFloat
-    living_area: PositiveFloat
-    kitchen_area: PositiveFloat
-    floor: PositiveInt
-    metro_station: str
-    minutes_to_metro: PositiveInt
-    transfer_type: str
-    house_age: PositiveInt
-    is_future_building: bool
+    flat_status: bool = Field(description='Сдаётся ли в данный момент квартира')
+    num_of_rooms: PropertyTypeEnum = Field(description='Количество комнат')
+    total_area: float = Field(gt=0, description='Общая площадь квартиры')
+    living_area: float = Field(gt=0, description='Жилая площадь квартиры')
+    kitchen_area: float = Field(gt=0, description='Площадь кухни')
+    floor: int = Field(gt=0, description='Этаж квартиры')
+    metro_station: str = Field(description='Ближайшая станция метро')
+    minutes_to_metro: int = Field(gt=0, description='Количество минут до метро')
+    transfer_type: MetroGetTypeEnum = Field(description='Способ добраться до метро')
+    house_age: int = Field(gt=0, description='Сколько лет прошло с постройки дома')
+    is_future_building: bool = Field(description='Находится ли дом в этапе стройки')
 
 class ModelPrediction(BaseModel):
-    price: float
+    price: float = Field(gt=0)
 
 @app.get("/health")
 def health():
