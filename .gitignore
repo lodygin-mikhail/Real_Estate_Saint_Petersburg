@@ -6,6 +6,12 @@ __pycache__/
 # C extensions
 *.so
 
+# MLflow files
+/mlflow
+*.joblib
+# catboost files
+/nootbooks/catboost_info
+
 # Distribution / packaging
 .Python
 build/
