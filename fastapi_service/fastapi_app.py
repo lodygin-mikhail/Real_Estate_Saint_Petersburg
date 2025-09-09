@@ -5,11 +5,9 @@ import pandas as pd
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 
-MODEL_PATH = Path(__file__).parent.parent / 'data'
-
 app = FastAPI()
 
-model = joblib.load(MODEL_PATH / "real_estate_pipeline.joblib")
+model = joblib.load("pipeline.joblib")
 
 class PropertyTypeEnum(str, Enum):
     STUDIO = "Студия"
@@ -67,4 +65,4 @@ def predict(features: PropertyFeatures):
 
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run(app, host='0.0.0.0', port=5000)
+    uvicorn.run("fastapi_app:app", reload=True, host='0.0.0.0', port=5000)
