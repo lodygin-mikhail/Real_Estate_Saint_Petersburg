@@ -1,13 +1,15 @@
 from enum import Enum
-
+from pathlib import Path
 import joblib
 import pandas as pd
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 
+MODEL_PATH = Path(__file__).parent.parent / 'data'
+
 app = FastAPI()
 
-model = joblib.load("config/real_estate_pipeline.joblib")
+model = joblib.load(MODEL_PATH / "real_estate_pipeline.joblib")
 
 class PropertyTypeEnum(str, Enum):
     STUDIO = "Студия"
@@ -65,4 +67,4 @@ def predict(features: PropertyFeatures):
 
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run('main:app', reload=True)
+    uvicorn.run(app, host='0.0.0.0', port=5000)

@@ -5,12 +5,11 @@ import joblib
 import streamlit as st
 import numpy as np
 
-ROOT_DIR = Path(__file__).parent.parent
-IMG_PATH = ROOT_DIR / 'img'
-MODEL_PATH = ROOT_DIR / 'config'
+IMG_PATH = Path(__file__).parent / 'img'
+MODEL_PATH = Path(__file__).parent.parent / 'data'
 
-ip_api = "127.0.0.1"
-port_api = "8000"
+ip_api = "fastapi_service"
+port_api = "5000"
 
 @st.cache_data
 def load_flat_type(path:Path):
@@ -26,7 +25,7 @@ def load_metro_stations(path:Path):
 
 st.title('Real Estate in Saint-Petersburg')
 
-st.image(IMG_PATH / 'buildings.avif', width=2000)
+st.image(IMG_PATH / 'buildings.avif')
 
 st.sidebar.subheader('Выберете параметры квартиры')
 
