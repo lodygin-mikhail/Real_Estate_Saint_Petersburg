@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  fastapi-service:
+    build:
+      context: .
+      dockerfile: fastapi_service/Dockerfile
+    image: fastapi_app:latest
+    container_name: fastapi_app
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./data/pipeline/pipeline.joblib:/app/pipeline.joblib
+      - ./fastapi_service/fastapi_app.py:/app/fastapi_app.py
+
+  streamlit-web:
+    build:
+      context: .
+      dockerfile: streamlit_service/Dockerfile
+    image: streamlit_app:latest
+    container_name: streamlit_app
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./streamlit_service/streamlit_app.py:/app/streamlit_app.py
+      - ./data/features:/app/features
