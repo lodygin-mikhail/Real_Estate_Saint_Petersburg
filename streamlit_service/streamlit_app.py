@@ -8,7 +8,7 @@ import numpy as np
 IMG_PATH = Path(__file__).parent / 'img'
 MODEL_PATH = Path(__file__).parent.parent / 'data'
 
-ip_api = "fastapi_service"
+ip_api = "fastapi_app"
 port_api = "5000"
 
 @st.cache_data
