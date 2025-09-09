@@ -8,7 +8,6 @@ __pycache__/
 
 # MLflow files
 /model_train/mlflow
-*.joblib
 # catboost files
 /model_train/nootbook/catboost_info
 
