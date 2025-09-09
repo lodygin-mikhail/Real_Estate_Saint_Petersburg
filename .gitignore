@@ -10,7 +10,7 @@ __pycache__/
 /mlflow
 *.joblib
 # catboost files
-/nootbooks/catboost_info
+/nootbook/catboost_info
 
 # Distribution / packaging
 .Python
