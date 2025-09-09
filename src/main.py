@@ -18,8 +18,8 @@ class PropertyTypeEnum(str, Enum):
     FIVE_ROOMS = "5-комнатная"
 
 class MetroGetTypeEnum(str, Enum):
-    LEGS = 'legs'
-    CAR = 'car'
+    LEGS = 'пешком'
+    CAR = 'на машине'
 
 class PropertyFeatures(BaseModel):
     flat_status: bool = Field(description='Сдаётся ли в данный момент квартира')
@@ -31,7 +31,7 @@ class PropertyFeatures(BaseModel):
     metro_station: str = Field(description='Ближайшая станция метро')
     minutes_to_metro: int = Field(gt=0, description='Количество минут до метро')
     transfer_type: MetroGetTypeEnum = Field(description='Способ добраться до метро')
-    house_age: int = Field(gt=0, description='Сколько лет прошло с постройки дома')
+    house_age: int = Field(ge=0, description='Сколько лет прошло с постройки дома')
     is_future_building: bool = Field(description='Находится ли дом в этапе стройки')
 
 class ModelPrediction(BaseModel):
