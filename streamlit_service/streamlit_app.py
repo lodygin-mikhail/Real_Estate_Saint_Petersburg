@@ -7,7 +7,7 @@ import numpy as np
 
 ROOT_DIR = Path(__file__).parent.parent
 IMG_PATH = ROOT_DIR / 'img'
-MODEL_PATH = ROOT_DIR / 'model'
+MODEL_PATH = ROOT_DIR / 'config'
 
 ip_api = "127.0.0.1"
 port_api = "8000"
@@ -47,7 +47,7 @@ with st.sidebar:
 
     minutes_to_metro = left.slider("Транспортная доступность в мин", 1, 60, 1, key = 'minutes_to_metro')
 
-    transport_type = right.selectbox("", ["пешком", "на машине"], key = 'transport_type')
+    transport_type = right.selectbox("Вид транспорта", ["пешком", "на машине"], label_visibility = 'hidden', key = 'transport_type')
 
 building_age = st.sidebar.slider('Укажите возраст здания', 0, 150, key = 'building_age')
 
@@ -74,7 +74,6 @@ if st.sidebar.button("Предсказать цену"):
         if response.status_code == 200:
             prediction = response.json()["prediction"]['price']
             st.success(f"Стоимость недвижимости: {prediction:.2f} рублей")
-            st.snow()
         else:
             st.error(f"Request failed with status code {response.status_code}")
     except ConnectionError as e:

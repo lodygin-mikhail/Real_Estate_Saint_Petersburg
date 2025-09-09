@@ -7,10 +7,10 @@ __pycache__/
 *.so
 
 # MLflow files
-/mlflow
+/model_train/mlflow
 *.joblib
 # catboost files
-/nootbook/catboost_info
+/model_train/nootbook/catboost_info
 
 # Distribution / packaging
 .Python

@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 
 app = FastAPI()
 
-model = joblib.load("model/real_estate_pipeline.joblib")
+model = joblib.load("config/real_estate_pipeline.joblib")
 
 class PropertyTypeEnum(str, Enum):
     STUDIO = "Студия"
