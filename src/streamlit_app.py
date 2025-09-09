@@ -3,7 +3,6 @@ import requests
 from requests.exceptions import ConnectionError
 import joblib
 import streamlit as st
-import pandas as pd
 import numpy as np
 
 ROOT_DIR = Path(__file__).parent.parent
@@ -11,7 +10,7 @@ IMG_PATH = ROOT_DIR / 'img'
 MODEL_PATH = ROOT_DIR / 'model'
 
 ip_api = "127.0.0.1"
-port_api = "500"
+port_api = "8000"
 
 @st.cache_data
 def load_flat_type(path:Path):
@@ -27,7 +26,7 @@ def load_metro_stations(path:Path):
 
 st.title('Real Estate in Saint-Petersburg')
 
-st.image(IMG_PATH / 'buildings.avif')
+st.image(IMG_PATH / 'buildings.avif', width=2000)
 
 st.sidebar.subheader('Выберете параметры квартиры')
 
@@ -56,3 +55,27 @@ flat_status = st.sidebar.toggle('Квартира сейчас сдаётся', 
 
 is_future_building = st.sidebar.toggle('Квартира еще строится', key = 'is_future_building')
 
+if st.sidebar.button("Предсказать цену"):
+    data = {
+        "flat_status": int(flat_status),
+        "num_of_rooms": flat_type,
+        "total_area": total_area,
+        "living_area": living_area,
+        "kitchen_area": kitchen_area,
+        "floor": floor,
+        "metro_station": station,
+        "minutes_to_metro": minutes_to_metro,
+        "transfer_type": transport_type,
+        "house_age": building_age,
+        "is_future_building": int(is_future_building)
+    }
+    try:
+        response = requests.post(f"http://{ip_api}:{port_api}/predict", json=data)
+        if response.status_code == 200:
+            prediction = response.json()["prediction"]['price']
+            st.success(f"Стоимость недвижимости: {prediction:.2f} рублей")
+            st.snow()
+        else:
+            st.error(f"Request failed with status code {response.status_code}")
+    except ConnectionError as e:
+        st.error(f"Failed to connect to the server")
