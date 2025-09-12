@@ -54,7 +54,7 @@ spb-real-estate-prediction/
 │   ├── streamlit_app.py
 │   ├── requirements.txt
 │   └── Dockerfile
-├── model_train/                 # Jupyter ноутбук
+├── model_train/                 # Jupyter ноутбуки
 │   ├── data/
 │   │   └── Spb_flats_prices.csv # Исходный csv файл
 │   ├── main.ipynb               # Предобработка, EDA и обучение моделей
