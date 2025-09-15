@@ -1,0 +1,36 @@
+schema: '2.0'
+stages:
+  clean_data:
+    cmd: python src/data/clean_data.py data/raw/Spb_flats_prices.csv 
+      data/raw/cleaned_data.csv
+    deps:
+    - path: data/raw/Spb_flats_prices.csv
+      hash: md5
+      md5: ca31020081f09862dba0602e28843257
+      size: 251334
+    - path: src/data/clean_data.py
+      hash: md5
+      md5: aff1499d416036f03b35bc8f18eb8ab1
+      size: 2021
+    outs:
+    - path: data/raw/cleaned_data.csv
+      hash: md5
+      md5: cebfbc181072d83823f42d5a40caff64
+      size: 206795
+  add_features:
+    cmd: python src/features/add_features.py data/raw/cleaned_data.csv 
+      data/raw/added_features.csv
+    deps:
+    - path: data/raw/cleaned_data.csv
+      hash: md5
+      md5: cebfbc181072d83823f42d5a40caff64
+      size: 206795
+    - path: src/features/add_features.py
+      hash: md5
+      md5: fdc5c0cda0127e60daa07b4d375ad7bb
+      size: 2445
+    outs:
+    - path: data/raw/added_features.csv
+      hash: md5
+      md5: 9b10f92cc7c761f79b7014450be44797
+      size: 82409
