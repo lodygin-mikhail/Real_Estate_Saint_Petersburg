@@ -1,0 +1,17 @@
+stages:
+  clean_data:
+    cmd: python src/data/clean_data.py data/raw/Spb_flats_prices.csv data/raw/cleaned_data.csv
+    deps:
+      - data/raw/Spb_flats_prices.csv
+      - src/data/clean_data.py
+    outs:
+      - data/raw/cleaned_data.csv
+
+
+  add_features:
+    cmd: python src/features/add_features.py data/raw/cleaned_data.csv data/raw/added_features.csv
+    deps:
+      - data/raw/cleaned_data.csv
+      - src/features/add_features.py
+    outs:
+      - data/raw/added_features.csv
