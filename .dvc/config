@@ -1,0 +1,9 @@
+[core]
+    remote = remote
+    autostage = false
+
+['remote "remote"']
+    url = s3://10083165-mlops-bucket
+    endpointurl = https://s3.twcstorage.ru
+    access_key_id = PMCPA7SJCRGWZJ5F3TO2
+    secret_access_key = QG4bVjOlC9yz3E5VQkdkvTwDhtSkPmgUtAQo7Qtx
