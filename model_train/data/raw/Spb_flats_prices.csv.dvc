@@ -1,0 +1,5 @@
+outs:
+- md5: ca31020081f09862dba0602e28843257
+  size: 251334
+  hash: md5
+  path: Spb_flats_prices.csv
