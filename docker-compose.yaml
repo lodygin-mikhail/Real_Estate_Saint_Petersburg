@@ -8,9 +8,16 @@ services:
     container_name: fastapi_app
     ports:
       - "6000:6000"
+    networks:
+      - s3
+      - postgres
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - MLFLOW_S3_ENDPOINT_URL=http://minio:9000
+      - AWS_ACCESS_KEY_ID=${MLFLOW_AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${MLFLOW_AWS_SECRET_ACCESS_KEY}
     volumes:
       - ./fastapi_service/fastapi_app.py:/app/fastapi_app.py
-      - ./ml_pipeline/models/model.joblib:/app/model.joblib
 
   streamlit-web:
     build:
@@ -19,6 +26,11 @@ services:
     container_name: streamlit_app
     ports:
       - "8501:8501"
+    networks:
+      - s3
+      - postgres
+    environment:
+      - FASTAPI_URL=http://fastapi-service:6000
     volumes:
       - ./streamlit_service/streamlit_app.py:/app/streamlit_app.py
       - ./ml_pipeline/artifacts/unique_values.json:/app/unique_values.json
@@ -59,9 +71,9 @@ services:
       - |
         mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD}
         mc admin user svcacct add --access-key ${MLFLOW_AWS_ACCESS_KEY_ID} --secret-key ${MLFLOW_AWS_SECRET_ACCESS_KEY} myminio ${MINIO_ROOT_USER}
-        mc mb myminio/${MLFLOW_BUCKET_NAME}
-        mc mb myminio/dvc-data
-        mc mb myminio/test-bucket
+        mc mb myminio/${MLFLOW_BUCKET_NAME} || true
+        mc mb myminio/dvc-data || true
+        mc mb myminio/test-bucket || true
 
   nginx:
     image: nginx
@@ -92,6 +104,11 @@ services:
       - "5432:5432"
     networks:
       - postgres
+    healthcheck:
+      test: ["CMD", "pg_isready", "-p", "5432", "-U", "${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
 
   pgadmin:
     container_name: pgadmin
@@ -120,12 +137,19 @@ services:
     environment:
       - AWS_ACCESS_KEY_ID=${MLFLOW_AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${MLFLOW_AWS_SECRET_ACCESS_KEY}
-      - MLFLOW_S3_ENDPOINT_URL=http://nginx:9000
+      - MLFLOW_S3_ENDPOINT_URL=http://minio:9000
+      - MLFLOW_S3_IGNORE_TLS=true
     command: >
       mlflow server
       --backend-store-uri postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db/${POSTGRES_DB}
-      --default-artifact-root s3://${MLFLOW_BUCKET_NAME}/
       --host 0.0.0.0
+      --serve-artifacts
+      --artifacts-destination s3://${MLFLOW_BUCKET_NAME}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 networks:
   postgres:
