@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 import requests
 from requests.exceptions import ConnectionError
@@ -5,54 +6,83 @@ import joblib
 import streamlit as st
 import numpy as np
 
-IMG_PATH = Path(__file__).parent / 'img'
-MODEL_PATH = Path(__file__).parent.parent / 'data'
+IMG_PATH = Path(__file__).parent / "img"
 
 ip_api = "fastapi_app"
 port_api = "5000"
 
-@st.cache_data
-def load_flat_type(path:Path):
-    flat_types = joblib.load(path / 'flat_type_names.joblib')
-    flat_types.sort()
-    return np.delete(flat_types, 5)
 
-@st.cache_data
-def load_metro_stations(path:Path):
-    stations = joblib.load(path / 'metro_station_names.joblib')
-    stations.sort()
-    return stations
+with open("unique_values.json", "r", encoding="utf-8") as f:
+    unique_values = json.load(f)
 
-st.title('Real Estate in Saint-Petersburg')
+st.title("Real Estate in Saint-Petersburg")
 
-st.image(IMG_PATH / 'buildings.avif')
+st.image(IMG_PATH / "buildings.avif")
 
-st.sidebar.subheader('Выберете параметры квартиры')
+st.sidebar.subheader("Выберете параметры квартиры")
 
-station = st.sidebar.selectbox('Выберете станцию метро', load_metro_stations(MODEL_PATH), key='metro_station')
+station = st.sidebar.selectbox(
+    "Выберете станцию метро",
+    unique_values["metro_station"],
+    key="metro_station",
+)
 
-flat_type = st.sidebar.selectbox('Выберете тип квартиры', load_flat_type(MODEL_PATH), key='flat_type')
+flat_type = st.sidebar.selectbox(
+    "Выберете тип квартиры",
+    unique_values["num_of_rooms"],
+    key="flat_type",
+)
 
-total_area = st.sidebar.slider('Укажите площадь квартиры в м\u00b2', 0.0, 250.0, 30.0, format='%.1f', key = 'total_area')
+total_area = st.sidebar.slider(
+    "Укажите площадь квартиры в м\u00b2",
+    0.0,
+    250.0,
+    30.0,
+    format="%.1f",
+    key="total_area",
+)
 
-living_area = st.sidebar.slider('Укажите жилую площадь квартиры в м\u00b2', 0.0, 200.0, 25.0, format='%.1f', key = 'living_area')
+living_area = st.sidebar.slider(
+    "Укажите жилую площадь квартиры в м\u00b2",
+    0.0,
+    200.0,
+    25.0,
+    format="%.1f",
+    key="living_area",
+)
 
-kitchen_area = st.sidebar.slider('Укажите площадь кухни в м\u00b2', 0.0, 50.0, 10.0, format='%.1f', key = 'kitchen_area')
+kitchen_area = st.sidebar.slider(
+    "Укажите площадь кухни в м\u00b2",
+    0.0,
+    50.0,
+    10.0,
+    format="%.1f",
+    key="kitchen_area",
+)
 
-floor = st.sidebar.slider('Укажите этаж', 1, 50, 1, key = 'floor')
+floor = st.sidebar.slider("Укажите этаж", 1, 50, 1, key="floor")
 
 with st.sidebar:
     left, right = st.columns(2, vertical_alignment="bottom")
 
-    minutes_to_metro = left.slider("Транспортная доступность в мин", 1, 60, 1, key = 'minutes_to_metro')
+    minutes_to_metro = left.slider(
+        "Транспортная доступность в мин", 1, 60, 1, key="minutes_to_metro"
+    )
 
-    transport_type = right.selectbox("Вид транспорта", ["пешком", "на машине"], label_visibility = 'hidden', key = 'transport_type')
+    transport_type = right.selectbox(
+        "Вид транспорта",
+        ["пешком", "на машине"],
+        label_visibility="hidden",
+        key="transport_type",
+    )
 
-building_age = st.sidebar.slider('Укажите возраст здания', 0, 150, key = 'building_age')
+building_age = st.sidebar.slider("Укажите возраст здания", 0, 150, key="building_age")
 
-flat_status = st.sidebar.toggle('Квартира сейчас сдаётся', key = 'flat_status')
+flat_status = st.sidebar.toggle("Квартира сейчас сдаётся", key="flat_status")
 
-is_future_building = st.sidebar.toggle('Квартира еще строится', key = 'is_future_building')
+is_future_building = st.sidebar.toggle(
+    "Квартира еще строится", key="is_future_building"
+)
 
 if st.sidebar.button("Предсказать цену"):
     data = {
@@ -66,12 +96,12 @@ if st.sidebar.button("Предсказать цену"):
         "minutes_to_metro": minutes_to_metro,
         "transfer_type": transport_type,
         "house_age": building_age,
-        "is_future_building": int(is_future_building)
+        "is_future_building": int(is_future_building),
     }
     try:
         response = requests.post(f"http://{ip_api}:{port_api}/predict", json=data)
         if response.status_code == 200:
-            prediction = response.json()["prediction"]['price']
+            prediction = response.json()["prediction"]["price"]
             st.success(f"Стоимость недвижимости: {prediction:.2f} рублей")
         else:
             st.error(f"Request failed with status code {response.status_code}")
