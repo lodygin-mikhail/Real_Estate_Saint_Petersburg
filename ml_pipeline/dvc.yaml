@@ -1,0 +1,47 @@
+stages:
+  clean_data:
+    cmd: python src/data/clean_data.py data/raw/Spb_flats_prices.csv data/interim/cleaned_data.csv
+    deps:
+      - data/raw/Spb_flats_prices.csv
+      - src/data/clean_data.py
+    outs:
+      - data/interim/cleaned_data.csv
+
+
+  add_features:
+    cmd: python src/features/add_features.py data/interim/cleaned_data.csv data/processed/dataset.csv artifacts/unique_values.json
+    deps:
+      - data/interim/cleaned_data.csv
+      - src/features/add_features.py
+    outs:
+      - data/processed/dataset.csv
+      - artifacts/unique_values.json
+
+
+  prepare_dataset:
+    cmd: python src/models/prepare_datasets.py data/processed/dataset.csv data/processed/train.csv data/processed/test.csv
+    deps:
+      - data/processed/dataset.csv
+      - src/models/prepare_datasets.py
+    outs:
+      - data/processed/train.csv
+      - data/processed/test.csv
+
+
+  train:
+    cmd: python src/models/train.py data/processed/train.csv data/processed/test.csv models/model.joblib
+    deps:
+      - data/processed/train.csv
+      - data/processed/test.csv
+      - src/models/train.py
+    outs:
+      - models/model.joblib
+
+
+  evaluate:
+    cmd: python src/models/evaluate.py data/processed/test.csv models/model.joblib reports/scores.csv
+    deps:
+      - models/model.joblib
+      - src/models/evaluate.py
+    outs:
+      - reports/scores.csv
