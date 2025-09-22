@@ -2,12 +2,12 @@ import json
 import os
 from typing import List
 
-import mlflow
 import pandas as pd
 import click
 import joblib as jb
 from catboost import CatBoostRegressor
 from lightgbm import LGBMRegressor
+import mlflow
 from mlflow.models import infer_signature
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestRegressor
@@ -22,8 +22,17 @@ from dotenv import load_dotenv
 RANDOM_STATE = 42
 
 load_dotenv()
-remote_server_uri = os.getenv("MLFLOW_TRACKING_URI")
-mlflow.set_tracking_uri(remote_server_uri)
+
+os.environ.update({
+    'AWS_ACCESS_KEY_ID': os.getenv('MLFLOW_AWS_ACCESS_KEY_ID', ''),
+    'AWS_SECRET_ACCESS_KEY': os.getenv('MLFLOW_AWS_SECRET_ACCESS_KEY', ''),
+    'MLFLOW_S3_ENDPOINT_URL': os.getenv('MLFLOW_S3_ENDPOINT_URL', 'http://localhost:9000')
+})
+
+# Настройка MLflow
+tracking_uri = os.getenv("MLFLOW_TRACKING_URI")
+if tracking_uri:
+    mlflow.set_tracking_uri(tracking_uri)
 
 NUM_COLS = [
     "total_area_m2",
@@ -47,7 +56,7 @@ CAT_COLS = [
 @click.argument("output_path", type=click.Path(), nargs=2)
 def train(input_paths: List[str], output_path: List[str]):
 
-    mlflow.set_experiment("House Price Prediction")
+    mlflow.set_experiment("Real Estate Price Prediction")
 
     with mlflow.start_run():
         train_df = pd.read_csv(input_paths[0])
@@ -134,13 +143,10 @@ def train(input_paths: List[str], output_path: List[str]):
         if hasattr(gs.best_estimator_, "predict"):
             mlflow.sklearn.log_model(
                 gs.best_estimator_,
-                "model",
+                name="model",
                 signature=signature,
                 registered_model_name="house_price_prediction",
             )
-
-        # Логирование артефактов
-        mlflow.log_artifact(output_path[0], "model_joblib")
 
         # Логирование информации о feature importance (если доступно)
         try:

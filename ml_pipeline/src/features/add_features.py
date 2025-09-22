@@ -58,11 +58,16 @@ def add_features(input_path: str, output_paths: List[str]):
 
     df.to_csv(output_paths[0], index=False)
 
-    categorical_features = df.select_dtypes(include=["object", "category"]).columns
-
     unique_values = {}
+
+    categorical_features = df.select_dtypes(include=["object", "category"]).columns
+    numerical_features = df.select_dtypes(include=["number"]).columns
+
     for feature in categorical_features:
         unique_values[feature] = sorted(df[feature].unique().tolist())
+
+    for feature in numerical_features:
+        unique_values[feature] = {"min": int(df[feature].min()), "max": int(df[feature].max())}
 
     unique_values['num_of_rooms'].remove("Неизвестно")
 

@@ -1,7 +1,7 @@
 import click
 import pandas as pd
 
-MAX_PRICE = 45000000
+MAX_PRICE = 30000000
 
 
 @click.command()
@@ -42,7 +42,7 @@ def clean_data(input_path: str, output_path: str):
         lambda x: x + "атная" if x not in ["Студия", "Неизвестно"] else x
     )
     # Оставляем только квартиры дешевле константы MAX_PRICE
-    df = df[df["price"] < 45000000]
+    df = df[df["price"] < MAX_PRICE]
 
     df.to_csv(output_path, index=False)
 
