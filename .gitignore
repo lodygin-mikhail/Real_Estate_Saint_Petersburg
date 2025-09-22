@@ -7,9 +7,15 @@ __pycache__/
 *.so
 
 # MLflow files
-/model_train/mlflow
+/ml_pipeline/mlflow
 # catboost files
-/model_train/nootbook/catboost_info
+/ml_pipeline/nootbook/catboost_info
+# credentials config
+/config/local_credentials.config
+# minio files
+minio
+# database files
+pgadmin
 
 # Distribution / packaging
 .Python
