@@ -1,16 +1,13 @@
 import json
+import os
 from pathlib import Path
 import requests
 from requests.exceptions import ConnectionError
-import joblib
 import streamlit as st
-import numpy as np
 
 IMG_PATH = Path(__file__).parent / "img"
 
-ip_api = "fastapi_app"
-port_api = "5000"
-
+FASTAPI_URL = os.getenv("FASTAPI_URL", "http://fastapi-service:6000")
 
 with open("unique_values.json", "r", encoding="utf-8") as f:
     unique_values = json.load(f)
@@ -35,8 +32,8 @@ flat_type = st.sidebar.selectbox(
 
 total_area = st.sidebar.slider(
     "Укажите площадь квартиры в м\u00b2",
-    0.0,
-    250.0,
+    15.0,
+    150.0,
     30.0,
     format="%.1f",
     key="total_area",
@@ -44,8 +41,8 @@ total_area = st.sidebar.slider(
 
 living_area = st.sidebar.slider(
     "Укажите жилую площадь квартиры в м\u00b2",
-    0.0,
-    200.0,
+    15.0,
+    150.0,
     25.0,
     format="%.1f",
     key="living_area",
@@ -54,19 +51,19 @@ living_area = st.sidebar.slider(
 kitchen_area = st.sidebar.slider(
     "Укажите площадь кухни в м\u00b2",
     0.0,
-    50.0,
+    25.0,
     10.0,
     format="%.1f",
     key="kitchen_area",
 )
 
-floor = st.sidebar.slider("Укажите этаж", 1, 50, 1, key="floor")
+floor = st.sidebar.slider("Укажите этаж", 1, 30, 1, key="floor")
 
 with st.sidebar:
     left, right = st.columns(2, vertical_alignment="bottom")
 
     minutes_to_metro = left.slider(
-        "Транспортная доступность в мин", 1, 60, 1, key="minutes_to_metro"
+        "Транспортная доступность в мин", 1, 60, 10, key="minutes_to_metro"
     )
 
     transport_type = right.selectbox(
@@ -99,7 +96,7 @@ if st.sidebar.button("Предсказать цену"):
         "is_future_building": int(is_future_building),
     }
     try:
-        response = requests.post(f"http://{ip_api}:{port_api}/predict", json=data)
+        response = requests.post(f"{FASTAPI_URL}/predict", json=data)
         if response.status_code == 200:
             prediction = response.json()["prediction"]["price"]
             st.success(f"Стоимость недвижимости: {prediction:.2f} рублей")

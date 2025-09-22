@@ -1,12 +1,21 @@
 from enum import Enum
-import joblib
+import mlflow
 import pandas as pd
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
-
 app = FastAPI()
 
-model = joblib.load("model.joblib")
+
+class Model:
+    def __init__(self, model_name, model_version):
+        self.model = mlflow.sklearn.load_model(f"models:/{model_name}/{model_version}")
+
+    def predict(self, data: pd.DataFrame) -> float:
+        prediction = self.model.predict(data)
+        return prediction
+
+
+model = Model("house_price_prediction", "latest")
 
 
 class PropertyTypeEnum(str, Enum):
@@ -71,4 +80,4 @@ def predict(features: PropertyFeatures):
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("fastapi_app:app", reload=True, host="0.0.0.0", port=5000)
+    uvicorn.run("fastapi_app:app", reload=True, host="0.0.0.0", port=6000)
