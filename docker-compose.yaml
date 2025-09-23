@@ -72,7 +72,6 @@ services:
         mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD}
         mc admin user svcacct add --access-key ${MLFLOW_AWS_ACCESS_KEY_ID} --secret-key ${MLFLOW_AWS_SECRET_ACCESS_KEY} myminio ${MINIO_ROOT_USER}
         mc mb myminio/${MLFLOW_BUCKET_NAME} || true
-        mc mb myminio/dvc-data || true
         mc mb myminio/test-bucket || true
 
   nginx:
@@ -131,6 +130,8 @@ services:
     container_name: mlflow_server
     ports:
       - "5000:5000"
+    depends_on:
+      - s3_setup
     networks:
       - postgres
       - s3
