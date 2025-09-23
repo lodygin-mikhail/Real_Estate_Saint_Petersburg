@@ -1,6 +1,6 @@
 stages:
   clean_data:
-    cmd: python src/data/clean_data.py data/raw/Spb_flats_prices.csv data/interim/cleaned_data.csv
+    cmd: python3 src/data/clean_data.py data/raw/Spb_flats_prices.csv data/interim/cleaned_data.csv
     deps:
       - data/raw/Spb_flats_prices.csv
       - src/data/clean_data.py
@@ -9,7 +9,7 @@ stages:
 
 
   add_features:
-    cmd: python src/features/add_features.py data/interim/cleaned_data.csv data/processed/dataset.csv artifacts/unique_values.json
+    cmd: python3 src/features/add_features.py data/interim/cleaned_data.csv data/processed/dataset.csv artifacts/unique_values.json
     deps:
       - data/interim/cleaned_data.csv
       - src/features/add_features.py
@@ -19,7 +19,7 @@ stages:
 
 
   prepare_dataset:
-    cmd: python src/models/prepare_datasets.py data/processed/dataset.csv data/processed/train.csv data/processed/test.csv
+    cmd: python3 src/models/prepare_datasets.py data/processed/dataset.csv data/processed/train.csv data/processed/test.csv
     deps:
       - data/processed/dataset.csv
       - src/models/prepare_datasets.py
@@ -29,7 +29,7 @@ stages:
 
 
   train:
-    cmd: python src/models/train.py data/processed/train.csv data/processed/test.csv models/model.joblib reports/metrics.json
+    cmd: python3 src/models/train.py data/processed/train.csv data/processed/test.csv models/model.joblib reports/metrics.json
     deps:
       - data/processed/train.csv
       - data/processed/test.csv
