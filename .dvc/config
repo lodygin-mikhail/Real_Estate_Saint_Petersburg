@@ -1,7 +1,7 @@
 [core]
-    remote = minio
+    remote = remote
     autostage = false
 
-['remote "minio"']
-    url = s3://dvc-data
-    endpointurl = http://localhost:9000
+['remote "remote"']
+    url = s3://10083165-mlops-bucket/dvc-data
+    endpointurl = https://s3.twcstorage.ru
