@@ -10,21 +10,21 @@ stages:
       size: 251334
     - path: src/data/clean_data.py
       hash: md5
-      md5: 2ab73fc9f48eee4f4960d478577e36dc
-      size: 1767
+      md5: a6d21aabf311d8cfb3f8c7528d4363cc
+      size: 1943
     outs:
     - path: data/interim/cleaned_data.csv
       hash: md5
-      md5: 11ec32803551f94036bdcb5fc054be59
-      size: 197234
+      md5: 0a5ef83a07a8d16673b837116bf78bcb
+      size: 196512
   add_features:
     cmd: python src/features/add_features.py data/interim/cleaned_data.csv 
       data/processed/dataset.csv artifacts/unique_values.json
     deps:
     - path: data/interim/cleaned_data.csv
       hash: md5
-      md5: 11ec32803551f94036bdcb5fc054be59
-      size: 197234
+      md5: 0a5ef83a07a8d16673b837116bf78bcb
+      size: 196512
     - path: src/features/add_features.py
       hash: md5
       md5: 8366a5d591dde6a0cb66ff1e1da7904d
@@ -32,20 +32,20 @@ stages:
     outs:
     - path: artifacts/unique_values.json
       hash: md5
-      md5: 076a54319f37a95acb8f32a57825b803
-      size: 2965
+      md5: dc4a52b19448df60ab6113288dcdb236
+      size: 2964
     - path: data/processed/dataset.csv
       hash: md5
-      md5: 81be520495785d48b477d80624b25b4f
-      size: 78775
+      md5: e72f95fa23c53210928698783248af81
+      size: 78486
   prepare_dataset:
     cmd: python src/models/prepare_datasets.py data/processed/dataset.csv 
       data/processed/train.csv data/processed/test.csv
     deps:
     - path: data/processed/dataset.csv
       hash: md5
-      md5: 81be520495785d48b477d80624b25b4f
-      size: 78775
+      md5: e72f95fa23c53210928698783248af81
+      size: 78486
     - path: src/models/prepare_datasets.py
       hash: md5
       md5: ea718eeb3faae08ff5b08aaef3ad4ca4
@@ -53,36 +53,36 @@ stages:
     outs:
     - path: data/processed/test.csv
       hash: md5
-      md5: 3ac6376938a83f8bdb0e9d628cc82a04
-      size: 18659
+      md5: bd3596edb8a022f291d38ef2a26e185b
+      size: 18583
     - path: data/processed/train.csv
       hash: md5
-      md5: 9aac1c7c729a079b911b42d3f6699d4b
-      size: 55357
+      md5: df1fbadbaeb8fe1971590354ca810eca
+      size: 55144
   train:
     cmd: python src/models/train.py data/processed/train.csv 
       data/processed/test.csv models/model.joblib reports/metrics.json
     deps:
     - path: data/processed/test.csv
       hash: md5
-      md5: 3ac6376938a83f8bdb0e9d628cc82a04
-      size: 18659
+      md5: bd3596edb8a022f291d38ef2a26e185b
+      size: 18583
     - path: data/processed/train.csv
       hash: md5
-      md5: 9aac1c7c729a079b911b42d3f6699d4b
-      size: 55357
+      md5: df1fbadbaeb8fe1971590354ca810eca
+      size: 55144
     - path: src/models/train.py
       hash: md5
-      md5: 7bc6f3d73e089756c26a955f36756b6f
-      size: 5541
+      md5: 1356de08f4ae67be5e67c0180c1d134d
+      size: 5546
     outs:
     - path: models/model.joblib
       hash: md5
-      md5: b7d554cda9c0e021a08415d0cb0720ad
-      size: 219156
+      md5: b3937ccbb9bb41ddb6cfccdb1b5740a4
+      size: 219506
     - path: reports/metrics.json
       hash: md5
-      md5: 66e2363a6a9a8d9705ff479dd7edba0c
+      md5: dca1adf4202762bd1ae00d1bad956137
       size: 98
   evaluate:
     cmd: python src/models/evaluate.py data/processed/test.csv 
