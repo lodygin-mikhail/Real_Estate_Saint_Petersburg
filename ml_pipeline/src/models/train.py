@@ -23,11 +23,15 @@ RANDOM_STATE = 42
 
 load_dotenv()
 
-os.environ.update({
-    'AWS_ACCESS_KEY_ID': os.getenv('MLFLOW_AWS_ACCESS_KEY_ID', ''),
-    'AWS_SECRET_ACCESS_KEY': os.getenv('MLFLOW_AWS_SECRET_ACCESS_KEY', ''),
-    'MLFLOW_S3_ENDPOINT_URL': os.getenv('MLFLOW_S3_ENDPOINT_URL', 'http://localhost:9000')
-})
+os.environ.update(
+    {
+        "AWS_ACCESS_KEY_ID": os.getenv("MLFLOW_AWS_ACCESS_KEY_ID", ""),
+        "AWS_SECRET_ACCESS_KEY": os.getenv("MLFLOW_AWS_SECRET_ACCESS_KEY", ""),
+        "MLFLOW_S3_ENDPOINT_URL": os.getenv(
+            "MLFLOW_S3_ENDPOINT_URL", "http://localhost:9000"
+        ),
+    }
+)
 
 # Настройка MLflow
 tracking_uri = os.getenv("MLFLOW_TRACKING_URI")
@@ -55,6 +59,12 @@ CAT_COLS = [
 @click.argument("input_paths", type=click.Path(exists=True), nargs=2)
 @click.argument("output_path", type=click.Path(), nargs=2)
 def train(input_paths: List[str], output_path: List[str]):
+    """
+    Function trains model and logges params, model and metrics with MLflow
+    :param input_paths: Path to read train and test DataFrames
+    :param output_path: Path to save trained model and metrics
+    :return:
+    """
 
     mlflow.set_experiment("Real Estate Price Prediction")
 
@@ -66,12 +76,12 @@ def train(input_paths: List[str], output_path: List[str]):
         mlflow.log_param("train_samples", len(train_df))
         mlflow.log_param("test_samples", len(test_df))
         mlflow.log_param("features", f"NUM: {NUM_COLS}, CAT: {CAT_COLS}")
-
+        # Разделение данных на переменные и целевую переменную
         x_train = train_df.drop("price", axis=1)
         y_train = train_df["price"]
         x_test = test_df.drop("price", axis=1)
         y_test = test_df["price"]
-
+        # Конфигурируем пайплайн обработки признаков
         data_preprocessor = ColumnTransformer(
             [
                 (
@@ -89,7 +99,7 @@ def train(input_paths: List[str], output_path: List[str]):
         pipeline = Pipeline(
             [("preprocessor", data_preprocessor), ("models", LinearRegression())]
         )
-
+        # Задаем параметры сетки для GridSearchCV
         param_grid = [
             {
                 "models": [DecisionTreeRegressor(random_state=RANDOM_STATE)],
@@ -108,7 +118,7 @@ def train(input_paths: List[str], output_path: List[str]):
         gs = GridSearchCV(
             pipeline, param_grid, scoring="neg_root_mean_squared_error", cv=5, n_jobs=-1
         )
-
+        # Инициализируем обучение пайплайна
         gs.fit(x_train, y_train)
 
         # Сохранение модели

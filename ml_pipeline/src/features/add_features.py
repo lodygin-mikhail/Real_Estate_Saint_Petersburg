@@ -30,8 +30,8 @@ def nearest_metro_station(json: dict) -> List[str]:
 @click.argument("output_paths", type=click.Path(), nargs=2)
 def add_features(input_path: str, output_paths: List[str]):
     """This function adds features to a csv file.
-    :param input_path:
-    :param output_paths:
+    :param input_path: Path to read cleaned DataFrame
+    :param output_paths: Path to save DataFrame with added features
     :return:
     """
     df = pd.read_csv(input_path)
@@ -55,9 +55,10 @@ def add_features(input_path: str, output_paths: List[str]):
     # Добавим бинарный признак строится ли еще дом
     df["is_future_building"] = (df["year_of_bulding"] > current_year).astype(int)
     df.drop("year_of_bulding", axis=1, inplace=True)
-
+    # Сохраняем полученный датафрейм
     df.to_csv(output_paths[0], index=False)
-
+    # Создадим JSON с уникальными значениями категориальных переменных
+    # и минимальными и максимальными значениями числовых переменных
     unique_values = {}
 
     categorical_features = df.select_dtypes(include=["object", "category"]).columns
@@ -67,10 +68,13 @@ def add_features(input_path: str, output_paths: List[str]):
         unique_values[feature] = sorted(df[feature].unique().tolist())
 
     for feature in numerical_features:
-        unique_values[feature] = {"min": int(df[feature].min()), "max": int(df[feature].max())}
+        unique_values[feature] = {
+            "min": int(df[feature].min()),
+            "max": int(df[feature].max()),
+        }
 
-    unique_values['num_of_rooms'].remove("Неизвестно")
-
+    unique_values["num_of_rooms"].remove("Неизвестно")
+    # Сохраним полученный JSON
     with open(output_paths[1], "w", encoding="utf-8") as f:
         json.dump(unique_values, f, indent=2, ensure_ascii=False)
 
